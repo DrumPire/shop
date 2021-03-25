@@ -16,6 +16,11 @@ button, input:focus {
     outline: none;
 }
 
+.cat-link {
+    text-decoration: none;
+    color: #fff;
+}
+
 .header {
     padding: 15px 0;
 }
