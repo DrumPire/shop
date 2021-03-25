@@ -21,6 +21,11 @@ button, input:focus {
     color: #fff;
 }
 
+.btn-danger {
+    background-color: tomato !important;
+    margin-left: auto;
+}
+
 .header {
     padding: 15px 0;
 }

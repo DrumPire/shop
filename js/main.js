@@ -17,6 +17,8 @@ const showAccessories = document.querySelectorAll('.show-accessories');
 const showClothing = document.querySelectorAll('.show-clothing');
 const cartTableGoods = document.querySelector('.cart-table__goods');
 const cardTableTotal = document.querySelector('.card-table__total');
+const cartCount = document.querySelector('.cart-count');
+const btnDanger = document.querySelector('.btn-danger');
 
 const getGoods = async function() {
 	const result = await fetch('db/db.json');
@@ -27,20 +29,17 @@ const getGoods = async function() {
 };
 
 const cart = {
-	cartGoods: [
-		{
-			id: "099",
-			name: "Clock Dior",
-			price: 999,
-			count: 2,
-		},
-		{
-			id: "090",
-			name: "shose Adiki",
-			price: 9,
-			count: 3,
-		},
-	],
+	cartGoods: [],
+	countQuantity() {
+		cartCount.textContent = this.cartGoods.reduce((sum, item) => {
+			return sum + item.count;
+		}, 0)
+	},
+	clearCart() {
+		this.cartGoods.length = 0;
+		this.countQuantity();
+		this.renderCart();
+	},
 	renderCart() {
 		cartTableGoods.textContent = '';
 		this.cartGoods.forEach(({ id, name, price, count }) => {
@@ -68,6 +67,7 @@ const cart = {
 	deleteGood(id) {
 		this.cartGoods = this.cartGoods.filter(item => id !== item.id);
 		this.renderCart();
+		this.countQuantity();
 	},
 	minusGood(id) {
 		for (const item of this.cartGoods) {
@@ -80,6 +80,7 @@ const cart = {
 			}
 		}
 		this.renderCart();
+		this.countQuantity();
 	},
 	plusGood(id) {
 		for (const item of this.cartGoods) {
@@ -89,6 +90,7 @@ const cart = {
 			}
 		}
 		this.renderCart();
+		this.countQuantity();
 	},
 	addCartGoods(id) {
 		const goodItem = this.cartGoods.find(item => item.id === id);
@@ -104,10 +106,13 @@ const cart = {
 							price,
 							count: 1
 						});
+						this.countQuantity();
 					});
 		}
 	},
 };
+
+btnDanger.addEventListener('click', cart.clearCart.bind(cart));
 
 document.body.addEventListener('click', event => {
 	const addToCart = event.target.closest('.add-to-cart');
