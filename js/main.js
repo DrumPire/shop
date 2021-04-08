@@ -18,7 +18,6 @@ const showClothing = document.querySelectorAll('.show-clothing');
 const cartTableGoods = document.querySelector('.cart-table__goods');
 const cardTableTotal = document.querySelector('.card-table__total');
 const cartCount = document.querySelector('.cart-count');
-const btnDanger = document.querySelector('.btn-danger');
 
 const getGoods = async function() {
 	const result = await fetch('db/db.json');
@@ -30,10 +29,14 @@ const getGoods = async function() {
 
 const cart = {
 	cartGoods: [],
+	getCountCartGoods() {
+		return this.cartGoods.length;
+	},
 	countQuantity() {
-		cartCount.textContent = this.cartGoods.reduce((sum, item) => {
+		const count = this.cartGoods.reduce((sum, item) => {
 			return sum + item.count;
 		}, 0)
+		cartCount.textContent = count ? count : '';
 	},
 	clearCart() {
 		this.cartGoods.length = 0;
@@ -112,8 +115,6 @@ const cart = {
 	},
 };
 
-btnDanger.addEventListener('click', cart.clearCart.bind(cart));
-
 document.body.addEventListener('click', event => {
 	const addToCart = event.target.closest('.add-to-cart');
 
@@ -171,12 +172,6 @@ const scrollLinks = document.querySelectorAll('a.scroll-link');
 		});
 	}
 }
-
-// Goods
-
-
-
-
 
 const createCard = ({ label, name, img, description, id, price }) => {
 	const card = document.createElement('div');
@@ -241,6 +236,7 @@ showClothing.forEach(item => {
 });
 
 // day 4
+
 const modalForm = document.querySelector('.modal-form');
 
 const postData = dataUser => fetch('server.php', {
@@ -248,27 +244,51 @@ const postData = dataUser => fetch('server.php', {
 	body: dataUser,
 });
 
+const validForm = (formData) => {
+	let valid = false;
+
+	for (const [, value] of formData) {
+		if (value.trim()) {
+			valid = true;
+		} else {
+			valid = false;
+			break;
+		}
+	}
+	return valid;
+}
+
 modalForm.addEventListener('submit', event => {
 	event.preventDefault();
 	
 	const formData = new FormData(modalForm);
-	formData.append('cart', JSON.stringify(cart.cartGoods));
 
-	postData(formData)
-		.then(response => {
-			if (!response.ok) {
-				throw new Error(response.status);
-			}
-			alert('Ваш заказ успешно отправлен, с вами свяжутся в ближайшее время');
-			console.log(response.statusText);
-		})
-		.catch(err => {
-			alert('К сожалению произошла ошибка, повторите попытку позже');
-			console.error(err);
-		})
-		.finally(() =>{
-			closeModal();
-			modalForm.reset();
-			cart.cartGoods.length = 0;
-		});
+	if (validForm(formData) && cart.getCountCartGoods()) {
+		formData.append('cart', JSON.stringify(cart.cartGoods));
+
+		postData(formData)
+			.then(response => {
+				if (!response.ok) {
+					throw new Error(response.status);
+				}
+				alert('Ваш заказ успешно отправлен, с вами свяжутся в ближайшее время');
+			})
+			.catch(err => {
+				alert('К сожалению произошла ошибка, повторите попытку позже');
+				console.error(err);
+			})
+			.finally(() =>{
+				closeModal();
+				modalForm.reset();
+				cart.clearCart();
+			});
+	} else {
+		if (!cart.getCountCartGoods()) {
+			alert('Добавте товар в корзину');
+		}
+		if (!validForm(formData)) {
+			alert('Заполните поля правильно');
+		}
+	}
+	
 });
