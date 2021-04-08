@@ -19,13 +19,32 @@ const cartTableGoods = document.querySelector('.cart-table__goods');
 const cardTableTotal = document.querySelector('.card-table__total');
 const cartCount = document.querySelector('.cart-count');
 
-const getGoods = async function() {
-	const result = await fetch('db/db.json');
-	if(!result.ok){
-		throw 'Ошибочка вышла: ' + result.status;
+const chekGoods = () => {
+	
+	const data = [];
+
+	return async () => {
+		if(data.length) return data;
+
+		const result = await fetch('db/db.json');
+		if(!result.ok) {
+			throw 'Ошибочка вышла: ' + result.status;
+		}
+		data.push(...(await result.json()));
+
+		return data;
 	}
-	return await result.json();
-};
+
+}
+
+const getGoods = chekGoods();
+// const getGoods = async function() {
+// 	const result = await fetch('db/db.json');
+// 	if(!result.ok){
+// 		throw 'Ошибочка вышла: ' + result.status;
+// 	}
+// 	return await result.json();
+// };
 
 const cart = {
 	cartGoods: [],
