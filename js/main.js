@@ -38,13 +38,6 @@ const chekGoods = () => {
 }
 
 const getGoods = chekGoods();
-// const getGoods = async function() {
-// 	const result = await fetch('db/db.json');
-// 	if(!result.ok){
-// 		throw 'Ошибочка вышла: ' + result.status;
-// 	}
-// 	return await result.json();
-// };
 
 const cart = {
 	cartGoods: [],
